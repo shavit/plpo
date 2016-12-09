@@ -7,14 +7,6 @@
 #define SIG_RNUM 8
 #define COLOR_DEPTH 8
 
-typedef struct PLPOImage {
-    int width;
-    int height;
-    int row_length;
-    int color_type;
-    unsigned char** bytes;
-} PLPOImage_t;
-
 void plpo_image_init(PLPOImage_t* img) {
     img->width      = -1;
     img->height     = -1;
