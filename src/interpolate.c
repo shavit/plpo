@@ -4,6 +4,21 @@ typedef struct Pixel {
     float b;
 } Pixel_t;
 
+Pixel_t get_pp(const int* bytes[], const int* m, const int* x, const int* y, const int* z) {
+    const int m2 = *m * *m;
+    const int u = (*z % *m) * m2;
+    const int v = (*z % *m) * m2;
+    const int ui = (u + *x) * 3;
+    const int vi = (v + *y);
+    
+    Pixel_t p;
+    p.r = bytes[v][u];
+    p.g = bytes[v][u + 1];
+    p.b = bytes[v][u + 2];
+    
+    return p;
+}
+
 typedef struct Lattice3D {
     int x0;
     int x1;
