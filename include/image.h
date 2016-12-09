@@ -1,10 +1,12 @@
 #ifndef PLPO_IMAGE_H
 #define PLPO_IMAGE_H
 
+#include <stddef.h>
+
 typedef struct PLPOImage {
-    int width;
-    int height;
-    int row_length;
+    size_t width;
+    size_t height;
+    size_t row_length;
     int color_type;
     unsigned char** bytes;
 } PLPOImage_t;
