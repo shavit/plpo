@@ -3,13 +3,16 @@ CFLAGS=-Wall -Werror -g
 LFLAGS=-L ./include/ -l m -l png 
 OUTEXEC=bin/plpo
 OBJECTS=src/main.c src/cli.c src/image.c src/interpolate.c src/plpo.c
+INPUT=build/original.png
+TABLE=build/table.png
+OUTPUT=build/output.png
 
 .PHONY: build
 build:
-	${CC} ${CFLAGS} ${OBJECTS} -o ${OUTEXEC} ${LFLAGS}
+	@${CC} ${CFLAGS} ${OBJECTS} -o ${OUTEXEC} ${LFLAGS}
 
 run: build
-	./bin/plpo 
+	@./bin/plpo ${INPUT} ${TABLE} ${OUTPUT}
 
 gdb: build
 	gdb --tui \
@@ -21,13 +24,13 @@ valgrind: build
 		./bin/plpo 
 
 cubuild:
-	nvcc src/main.cu src/image.c src/interpolate.cu src/plpo.cu \
+	@nvcc src/main.cu src/image.c src/interpolate.cu src/plpo.cu \
 		-g \
 		-o bin/curun \
 		-L ./include/ -l png
 
 curun: cubuild
-	@./bin/curun
+	@./bin/curun ${INPUT} ${TABLE} ${OUTPUT}
 
 cusanitizer: cubuild
 	compute-sanitizer \
@@ -35,4 +38,4 @@ cusanitizer: cubuild
 
 .PHONY: clean
 clean:
-	rm -r ./build/result.png ./bin/*
+	rm ./build/output.png ./bin/*

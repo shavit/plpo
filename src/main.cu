@@ -42,7 +42,6 @@ void mem_assign_flatten(unsigned char* output, unsigned char** input, const int 
     }
 }
 
-// Helper to check for cuda errors
 void checkCudaError(const char* msg) {
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
@@ -53,14 +52,10 @@ void checkCudaError(const char* msg) {
     }
 }
 
-// deterimne the maximum potential block size
 void determineCudaMaxBlockSize(int* numBlocks, int* maxBlockSize) {
     cudaOccupancyMaxPotentialBlockSize(numBlocks, maxBlockSize, plpo_make_trilerp);
-
-    fprintf(stderr, "Determined cuda potential block size.\n\t%d blocks (numBlocks)\n\t%d grid size (maxBlockSize)\n", *numBlocks, *maxBlockSize);
+    //fprintf(stderr, "Determined cuda potential block size.\n\t%d blocks (numBlocks)\n\t%d grid size (maxBlockSize)\n", *numBlocks, *maxBlockSize);
 }
-
-// reading images
 
 __host__
 int main(int argvc, char** argv) {
@@ -90,7 +85,7 @@ int main(int argvc, char** argv) {
     int numBlocks;
     int maxBlockSize;
     determineCudaMaxBlockSize(&numBlocks, &maxBlockSize);
-   const dim3 dim_block(maxBlockSize / 32 / 2, maxBlockSize / 32 / 2, 1); // threads per block pad
+   const dim3 dim_block(maxBlockSize / 32 / 2, maxBlockSize / 32 / 2, 1);
     dim3 dim_grid((img->height - 1) / dim_block.x + 1, (img->width - 1) / dim_block.y + 1, 1); // round up
     
     unsigned char* cuimg_mat;
