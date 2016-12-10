@@ -6,20 +6,22 @@
 #include "../include/plpo.cuh"
 
 extern "C" {
-#include "../include/cli.h"
 #include "../include/image.h"
 }
 
+typedef struct PLPO_CLIArgs {
+    char* image_path;
+    char* filter_path;
+    char* out_image_path;
+} PLPO_CLIArgs_t;
+
 __host__
 int read_args(int argvc, char** argv, PLPO_CLIArgs_t* args) {
-    if (argvc < 4) {
-        return -1;
-    }
+    if (argvc < 4) return -1;
 
     args->image_path = argv[1];
     args->filter_path = argv[2];
     args->out_image_path = argv[3];
-    args->parallel = false;
 
     return 0;
 }

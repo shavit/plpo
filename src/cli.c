@@ -5,12 +5,6 @@
 #include "../include/image.h"
 #include "../include/plpo.h"
 
-typedef struct PLPO_CLIArgs {
-    char* image_path;
-    char* filter_path;
-    char* out_image_path;
-} PLPO_CLIArgs_t;
-
 int read_args(int argvc, char** argv, PLPO_CLIArgs_t* args) {
     if (argvc < 4) {
         return -1;
