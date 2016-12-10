@@ -63,8 +63,7 @@ int plpo_image_read(const char* path, PLPOImage_t* img) {
     }
 
     if (setjmp(png_jmpbuf(img_p))) {
-        png_destroy_read_struct(&img_p, (png_infopp)NULL, (png_infopp)NULL);
-        png_free(img_p, NULL);
+        png_destroy_read_struct(&img_p, &info, (png_infopp)NULL);
         fclose(f);
         return -1;
     }
@@ -77,21 +76,20 @@ int plpo_image_read(const char* path, PLPOImage_t* img) {
     png_byte color_type = png_get_color_type(img_p, info);
     if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(img_p);
     if (color_type == PNG_COLOR_TYPE_GRAY && b_depth < 8) png_set_expand_gray_1_2_4_to_8(img_p);
-    if (color_type == PNG_COLOR_TYPE_GRAY ||
-            color_type == PNG_COLOR_TYPE_GRAY_ALPHA) png_set_gray_to_rgb(img_p);
-    if (color_type == PNG_COLOR_TYPE_RGB ||
-            color_type == PNG_COLOR_TYPE_GRAY ||
-            color_type == PNG_COLOR_TYPE_PALETTE) png_set_gray_to_rgb(img_p);
-    if (color_type == PNG_COLOR_TYPE_GRAY ||
-            color_type == PNG_COLOR_TYPE_GRAY_ALPHA) png_set_gray_to_rgb(img_p);
+    if (color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA) png_set_gray_to_rgb(img_p);
 
     png_read_update_info(img_p, info);
-    img->color_type = color_type;
+    img->color_type = png_get_color_type(img_p, info);
     img->width  = png_get_image_width(img_p, info);
     img->height = png_get_image_height(img_p, info);
     img->row_length = (int) png_get_rowbytes(img_p, info);
     
     img->bytes = malloc(sizeof(*img->bytes) * img->height);
+    if (img->bytes == NULL) {
+        png_destroy_read_struct(&img_p, &info, (png_infopp)NULL);
+        fclose(f);
+        return -1;
+    }
     for (int x = 0; x < img->height; ++x) {
         img->bytes[x] = malloc(sizeof(**img->bytes) * img->row_length);
     }
@@ -101,7 +99,6 @@ int plpo_image_read(const char* path, PLPOImage_t* img) {
 
     fclose(f);
     png_destroy_read_struct(&img_p, &info, NULL);
-    png_free(img_p, NULL);
     
     return 0;
 }
@@ -129,8 +126,7 @@ int plpo_image_write(const char* path, PLPOImage_t* img) {
     }
 
     if (setjmp(png_jmpbuf(img_o))) {
-        png_destroy_read_struct(&img_o, &info, NULL);
-        png_free(img_o, NULL);
+        png_destroy_write_struct(&img_o, &info);
         fclose(f);
         return -1;
     }
@@ -150,8 +146,7 @@ int plpo_image_write(const char* path, PLPOImage_t* img) {
     png_write_info(img_o, info);
     png_write_image(img_o, img->bytes);
     
-    png_destroy_read_struct(&img_o, &info, NULL);
-    png_free(img_o, NULL);
+    png_destroy_write_struct(&img_o, &info);
     fclose(f);
 
     return 0;
