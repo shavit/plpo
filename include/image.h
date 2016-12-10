@@ -4,9 +4,9 @@
 #include <stddef.h>
 
 typedef struct PLPOImage {
-    size_t width;
-    size_t height;
-    size_t row_length;
+    int width;
+    int height;
+    int row_length;
     int color_type;
     unsigned char** bytes;
 } PLPOImage_t;
