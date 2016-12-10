@@ -100,14 +100,13 @@ Pixel_t interpolate_lattice3d(const Lattice3D_t* lat, const float* r, const floa
 
 
 __global__
-void plpo_make_trilerp(unsigned char* lut_mat , unsigned char* img_mat, int w, int h, const int m, const int m2, float sig) {
+void plpo_make_trilerp(unsigned char* lut_mat , unsigned char* img_mat, int w, int h, const int m, const int m2, float sig, int ch) {
     const unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
     const unsigned int y = blockIdx.y * blockDim.y + threadIdx.y;
     const unsigned int max_x = h;
     const unsigned int max_y = (w * 3);
     if ((x > max_x) || (y > max_y)) return;
 
-    const int ch = 3; 
     const int xy = (x * w + y) * ch;
     const float r = img_mat[xy] * sig;
     const float g = img_mat[xy + 1] * sig;
