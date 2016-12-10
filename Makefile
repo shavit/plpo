@@ -24,7 +24,7 @@ valgrind: build
 		./bin/plpo 
 
 cubuild:
-	@nvcc src/main.cu src/image.c src/interpolate.cu src/plpo.cu \
+	@nvcc src/main.cu src/image.c src/plpo.cu \
 		-g \
 		-o bin/curun \
 		-L ./include/ -l png

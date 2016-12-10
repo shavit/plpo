@@ -57,6 +57,13 @@ void determineCudaMaxBlockSize(int* numBlocks, int* maxBlockSize) {
     //fprintf(stderr, "Determined cuda potential block size.\n\t%d blocks (numBlocks)\n\t%d grid size (maxBlockSize)\n", *numBlocks, *maxBlockSize);
 }
 
+void set_grid_block_dims(dim3& dim_block, dim3& dim_grid, int w, int h) {
+    int numBlocks, maxBlockSize;
+    determineCudaMaxBlockSize(&numBlocks, &maxBlockSize);
+    dim_block = dim3(maxBlockSize / 32 / 2, maxBlockSize / 32 / 2, 1);
+    dim_grid = dim3((h- 1) / dim_block.x + 1, (w - 1) / dim_block.y + 1, 1); // round up
+}
+
 __host__
 int main(int argvc, char** argv) {
     int err = 0;
@@ -82,11 +89,8 @@ int main(int argvc, char** argv) {
     unsigned char* lut_1d = (unsigned char*) malloc(sizeof(unsigned char) * lut->row_length * lut->height);
     mem_assign_flatten(lut_1d, lut->bytes, lut->row_length, lut->height);
 
-    int numBlocks;
-    int maxBlockSize;
-    determineCudaMaxBlockSize(&numBlocks, &maxBlockSize);
-    const dim3 dim_block(maxBlockSize / 32 / 2, maxBlockSize / 32 / 2, 1);
-    dim3 dim_grid((img->height - 1) / dim_block.x + 1, (img->width - 1) / dim_block.y + 1, 1); // round up
+    dim3 dim_block, dim_grid;
+    set_grid_block_dims(dim_block, dim_grid, img->width, img->height);
 
     unsigned char* cuimg_mat;
     cudaMalloc((void**) &cuimg_mat, sizeof(unsigned char) * img->row_length * img->height);
